@@ -21,10 +21,10 @@ RUN set -eux; \
         libc-dev \
         libffi-dev \
         openssl-dev \
-        py-pip \
-        python-dev \
+        python3-dev \
     ; \
-    pip install docker-compose;
+    ln -sf python3 /usr/bin/python && python3 -m ensurepip; \
+    pip3 install docker-compose;
 
 RUN set -eux; \
     curl -L "https://storage.googleapis.com/kubernetes-release/release/${kubectl_version}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl; \

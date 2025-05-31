@@ -1,3 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: neo4j
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 80Gi
+---
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -47,12 +59,15 @@ spec:
         - name: NEO4J_dbms_allow__upgrade
           value: 'true'
         volumeMounts:
-        - name: data
+        - name: neo4jvol
           mountPath: /data
-        - name: logs
+          subPath: data
+        - name: neo4jvol
           mountPath: /logs
-        - name: plugins
+          subPath: logs
+        - name: neo4jvol
           mountPath: /plugins
+          subPath: plugins
         readinessProbe:
           tcpSocket:
             port: 7687
@@ -73,8 +88,9 @@ spec:
       - name: pull-plugins
         image: appropriate/curl:latest
         volumeMounts:
-        - name: plugins
+        - name: neo4jvol
           mountPath: /plugins
+          subPath: plugins
         env:
         - name: HTTP_PROXY
           valueFrom:
@@ -96,31 +112,7 @@ spec:
         - "-c"
         - |
           curl -x "${HTTP_PROXY}" -sSL https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.5.0.7/apoc-3.5.0.7-all.jar > "/plugins/apoc-3.5.0.7-all.jar";
-  volumeClaimTemplates:
-  - metadata:
-      name: "data"
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: hostpath
-      resources:
-        requests:
-          storage: 2Gi
-  - metadata:
-      name: "logs"
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: hostpath
-      resources:
-        requests:
-          storage: 1Gi
-  - metadata:
-      name: "plugins"
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      storageClassName: hostpath
-      resources:
-        requests:
-          storage: 1Gi
+      volumes:
+        - name: neo4jvol
+          persistentVolumeClaim:
+            claimName: neo4j
