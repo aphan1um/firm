@@ -49,7 +49,7 @@ CUDA = True
 class DDPG:
     def __init__(self, env):
         self.env = env
-        self.stateDim = 5+2+3
+        self.stateDim = 5+2+3-1
         self.actionDim = 3*5
         if CUDA:
             self.actor = Actor(self.env).cuda()
@@ -135,12 +135,10 @@ class DDPG:
                 curr_arrival_rate = state['curr_arrival_rate']
                 cpu_limit = state['cpu_limit']
                 mem_limit = state['mem_limit']
-                llc_limit = state['llc_limit']
                 io_limit = state['io_limit']
                 net_limit = state['net_limit']
                 curr_cpu_util = state['curr_cpu_util']
                 curr_mem_util = state['curr_mem_util']
-                curr_llc_util = state['curr_llc_util']
                 curr_io_util = state['curr_io_util']
                 curr_net_util = state['curr_net_util']
                 slo_retainment = state['slo_retainment']
@@ -151,13 +149,13 @@ class DDPG:
                 if episode == NUM_EPISODES-1:
                     print("EP:", episode, " | Step:", step)
                     print("Update - Current SLO Retainment:", slo_retainment)
-                    print("Update - Current Util:", str(curr_cpu_util)+'/'+str(cpu_limit), str(curr_mem_util)+'/'+str(mem_limit), str(curr_llc_util)+'/'+str(llc_limit), str(curr_io_util)+'/'+str(io_limit), str(curr_net_util)+'/'+str(net_limit))
+                    print("Update - Current Util:", str(curr_cpu_util)+'/'+str(cpu_limit), str(curr_mem_util)+'/'+str(mem_limit), str(curr_io_util)+'/'+str(io_limit), str(curr_net_util)+'/'+str(net_limit))
 
                 # Get maximizing action
                 if CUDA:
-                    curState = Variable(obs2state([curr_cpu_util/cpu_limit,curr_mem_util/mem_limit,curr_llc_util/llc_limit,curr_io_util/io_limit,curr_net_util/net_limit,slo_retainment,rate_ratio,percentages[0],percentages[1],percentages[2]]), volatile=True).cuda()
+                    curState = Variable(obs2state([curr_cpu_util/cpu_limit,curr_mem_util/mem_limit,curr_io_util/io_limit,curr_net_util/net_limit,slo_retainment,rate_ratio,percentages[0],percentages[1],percentages[2]]), volatile=True).cuda()
                 else:
-                    curState = Variable(obs2state([curr_cpu_util/cpu_limit,curr_mem_util/mem_limit,curr_llc_util/llc_limit,curr_io_util/io_limit,curr_net_util/net_limit,slo_retainment,rate_ratio,percentages[0],percentages[1],percentages[2]]), volatile=True) 
+                    curState = Variable(obs2state([curr_cpu_util/cpu_limit,curr_mem_util/mem_limit,,curr_io_util/io_limit,curr_net_util/net_limit,slo_retainment,rate_ratio,percentages[0],percentages[1],percentages[2]]), volatile=True) 
                 self.actor.eval()     
                 action = self.getMaxAction(curState)
                 curState.volatile = False

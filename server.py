@@ -69,7 +69,6 @@ class InteractionServicer(message_pb2_grpc.InteractionServicer):
         message.id = request.id
         message.usage.cpu = metrics_stat['cpu']
         message.usage.memory = metrics_stat['memory']
-        message.usage.llc = metrics_stat['cache']
         message.usage.network = metrics_stat['network']
         message.usage.io = metrics_stat['diskio']
         message.limit = None;
@@ -87,7 +86,6 @@ class InteractionServicer(message_pb2_grpc.InteractionServicer):
             # execute action
             actions.cpu(request.id, request.action.cpu, self.container_map[request.id].cores)
             actions.memory(request.id, request.action.memory, self.container_map[request.id].cores)
-            actions.llc(request.id, request.action.llc)
             actions.blkio(request.id, request.action.io)
             actions.network(request.id, request.action.network)
             # response
@@ -98,7 +96,6 @@ class InteractionServicer(message_pb2_grpc.InteractionServicer):
             message.id = request.id
             message.usage.cpu = metrics_stat['cpu']
             message.usage.memory = metrics_stat['memory']
-            message.usage.llc = metrics_stat['cache']
             message.usage.network = metrics_stat['network']
             message.usage.io = metrics_stat['diskio']
             message.limit = None;

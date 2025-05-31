@@ -37,13 +37,7 @@ def memory(id, value, cores):
     os.system('sudo ./scripts/association_app ' + value + ' '.join(cores))
 
 def llc(id, value, cores):
-    if value < 0 or value > NUM_COS_MBA-1:
-        raise ValueError('Invalid Value!')
-    current_script = os.path.realpath(__file__)
-    os.system('echo %s | sudo -S python %s' % (SUDO_PASSWORD, current_script))
-
-    logging.info('llc - id: ' + id + ' - delta: ' + value)
-    os.system('sudo ./scripts/association_app ' + value + ' '.join(cores))
+    pass
 
 def network(id, value):
     if value < 0 or value > NUM_NET_CLS-1:
